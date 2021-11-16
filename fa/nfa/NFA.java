@@ -29,7 +29,7 @@ public class NFA implements NFAInterface {
         NFAState s = checkIfExists(name);
         if(s == null){
             s = new NFAState(name);
-            addState(s);
+            addState(s.toString());
         } else {
             System.out.println("WARNING: A state with name " + name + " already exists in the DFA");
         }
@@ -76,13 +76,13 @@ public class NFA implements NFAInterface {
         return null;
     }
 
-    @Override
     public Set<NFAState> getToState(NFAState from, char onSymb) {
+
         return null;
     }
 
-    @Override
     public Set<NFAState> eClosure(NFAState s) {
+
         return null;
     }
 
