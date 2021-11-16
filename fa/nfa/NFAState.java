@@ -7,5 +7,8 @@ import fa.State;
  * @author Quinn Shultz, Mateo Ortegon
  */
 public class NFAState extends State {
+    public NFAState(String name){
+
+    }
 
 }
