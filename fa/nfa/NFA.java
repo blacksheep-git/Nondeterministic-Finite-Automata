@@ -31,8 +31,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @param
-     * @return
+     * @param name
      */
     @Override
     public void addStartState(String name) {
@@ -47,12 +46,11 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @param
-     * @return
+     * @param name
      */
     @Override
     public void addState(String name) {
-        NFAState state = new NFAState(name);
+        NFAState state = checkIfExists(name,allStates);
         if(state == null){ //if state doesn't exist in allStates collection then create a new NFAState object and add
             state = new NFAState(name);
         }
@@ -62,8 +60,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @param
-     * @return
+     * @param name
      */
     @Override
     public void addFinalState(String name) {
@@ -75,10 +72,9 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @param
-     * @param
-     * @param
-     * @return
+     * @param from
+     * @param onSymb
+     * @param to
      */
     @Override
     public void addTransition(String from, char onSymb, String to) {
@@ -100,7 +96,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return
+     * @return restStates
      */
     @Override
     public Set<NFAState> getStates() {
@@ -109,7 +105,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return
+     * @return finalStates
      */
     @Override
     public Set<NFAState> getFinalStates() {
@@ -118,7 +114,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return
+     * @return startState
      */
     @Override
     public State getStartState() {
@@ -127,7 +123,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return
+     * @return alphabet
      */
     @Override
     public Set<Character> getABC() {
@@ -136,7 +132,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return
+     * @return dfa
      */
     @Override
     public DFA getDFA() { //TODO: RE-RWITE
@@ -250,7 +246,7 @@ public class NFA implements NFAInterface {
      * TODO
      * @param hashSet
      * @param st
-     * @return
+     * @return eClosureSet
      */
     private Set<NFAState> search(LinkedHashSet<NFAState> hashSet, NFAState st){ //TODO: RE-RWITE
         LinkedHashSet<NFAState> visitedStates = hashSet;
