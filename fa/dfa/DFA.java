@@ -103,7 +103,7 @@ public class DFA implements DFAInterface{
 	}
 
 	/** (non-Javadoc)
-	 * @see p1.DFAInterface#toString()
+	 * @see fa.dfa.DFAInterface#toString()
 	 **/
 	@Override
 	public String toString(){
