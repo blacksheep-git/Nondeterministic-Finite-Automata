@@ -15,6 +15,8 @@ public class NFA implements NFAInterface {
     private final Set<NFAState> finalStates;
     private final Set<NFAState> allStates;
     private final Set<Character> alphabet;
+    private final LinkedHashSet<NFAState> eClosure;
+    LinkedHashSet<NFAState> states;
 
     private NFAState startState; //save reference so don't have to look for it later
     private final char e = 'e'; //empty transition char
@@ -27,6 +29,9 @@ public class NFA implements NFAInterface {
         finalStates = new LinkedHashSet<NFAState>();
         alphabet = new LinkedHashSet<Character>();
         allStates = new LinkedHashSet<NFAState>();
+        eClosure = new LinkedHashSet<NFAState>();
+        states = new LinkedHashSet<NFAState>();
+
     }
 
     /**
@@ -222,7 +227,16 @@ public class NFA implements NFAInterface {
      * @return Set<NFAState>
      */
     public Set<NFAState> eClosure(NFAState state){
-        return search(new LinkedHashSet<>(), state);
+
+        eClosure.add(state);
+
+        if(!getToState(state,e).isEmpty() && !states.contains(state)){
+            states.add(state);
+            for(NFAState s : getToState(state,e)){
+                eClosure.addAll(eClosure(s));
+            }
+        }
+        return eClosure;
     }
 
     /**
@@ -244,22 +258,23 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @param hashSet
-     * @param st
-     * @return eClosureSet
+     * @param states
+     * @param eClosure
+     * @param currentState
+     * @return eClosure
      */
-    private Set<NFAState> search(LinkedHashSet<NFAState> hashSet, NFAState st){ //TODO: RE-RWITE
-        LinkedHashSet<NFAState> visitedStates = hashSet;
-        LinkedHashSet<NFAState> eClosureSet = new LinkedHashSet<>();
-
-        eClosureSet.add(st);
-        /* As long as there exists a state to go to on an empty transition */
-        if(!getToState(st,e).isEmpty() && !visitedStates.contains(st)){
-            visitedStates.add(st);
-            for(NFAState nfa : getToState(st,e)){
-                eClosureSet.addAll(search(visitedStates, nfa));
-            }
-        }
-        return eClosureSet;
-    }
+//    private Set<NFAState> depthFirstSearch(LinkedHashSet<NFAState> states, LinkedHashSet<NFAState> eClosure, NFAState currentState){
+//
+//        eClosure.add(currentState);
+//
+//        if(!getToState(currentState,e).isEmpty() && !states.contains(currentState)){
+//            states.add(currentState);
+//            for(NFAState state : getToState(currentState,e)){
+//                for(NFAState s: depthFirstSearch(states, eClosure, state)){
+//                    eClosure.add(s);
+//                }
+//            }
+//        }
+//        return eClosure;
+//    }
 }
