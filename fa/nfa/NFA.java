@@ -8,7 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
- * Nodeterministic Finite Automata
+ * Nondeterministic Finite Automata
  * @author Quinn Shultz, Mateo Ortegon
  */
 public class NFA implements NFAInterface {
@@ -18,6 +18,9 @@ public class NFA implements NFAInterface {
 
     private NFAState startState;
 
+    /**
+     * Construct a new Nondeterministic Finite Automata
+     */
     public NFA(){
         restStates = new LinkedHashSet<NFAState>();
         finalStates = new LinkedHashSet<NFAState>();
@@ -31,58 +34,79 @@ public class NFA implements NFAInterface {
             s = new NFAState(name);
             addState(s.toString());
         } else {
-            System.out.println("WARNING: A state with name " + name + " already exists in the DFA");
+       	 System.out.println("WARNING: A state with name " + name + " already exists in the NFA");
         }
         startState = s;
     }
 
     @Override
     public void addState(String name) {
-
+    	NFAState s = checkIfExists(name);
+    	 if(s == null){
+             s = new NFAState(name);
+             restStates.add(s);
+         } else {
+        	 System.out.println("WARNING: A state with name " + name + " already exists in the NFA");
+         }
     }
 
     @Override
     public void addFinalState(String name) {
-
+    	NFAState s = checkIfExists(name);
+    	if(s == null){
+            s = new NFAState(name);
+            addState(s.toString());
+        } else {
+       	 System.out.println("WARNING: A state with name " + name + " already exists in the NFA");
+        }
+    	finalStates.add(s);
     }
 
     @Override
     public void addTransition(String fromState, char onSymb, String toState) {
-
+    	// TODO: Complete this method
     }
 
     @Override
-    public Set<? extends State> getStates() {
-        return null;
+    public Set<NFAState> getStates() {
+        return restStates;
     }
 
     @Override
-    public Set<? extends State> getFinalStates() {
-        return null;
+    public Set<NFAState> getFinalStates() {
+    	Set<NFAState> ret = new LinkedHashSet<NFAState>();
+    	for (NFAState s : restStates) {
+    		if (s.isFinal()) {
+    			ret.add(s);
+    		}
+    	}
+        return ret;
     }
 
     @Override
     public State getStartState() {
-        return null;
+        return startState;
     }
 
     @Override
     public Set<Character> getABC() {
+    	// TODO: Complete this method
         return null;
     }
 
     @Override
     public DFA getDFA() {
+    	// TODO: Complete this method
         return null;
     }
 
     public Set<NFAState> getToState(NFAState from, char onSymb) {
-
+    	// TODO: Complete this method
         return null;
     }
 
     public Set<NFAState> eClosure(NFAState s) {
-
+    	// TODO: Complete this method
         return null;
     }
 
