@@ -2,7 +2,6 @@ package fa.nfa;
 
 import fa.State;
 import fa.dfa.DFA;
-import fa.dfa.DFAState;
 
 import java.util.*;
 
@@ -22,20 +21,20 @@ public class NFA implements NFAInterface {
     private final char e = 'e'; //empty transition char
 
     /**
-     * Construct a new Nondeterministic Finite Automata
+     * Construct Nondeterministic Finite Automata
      */
     public NFA(){
-        restStates = new LinkedHashSet<NFAState>();
-        finalStates = new LinkedHashSet<NFAState>();
-        alphabet = new LinkedHashSet<Character>();
-        allStates = new LinkedHashSet<NFAState>();
-        eClosure = new LinkedHashSet<NFAState>();
-        searchedStates = new LinkedHashSet<NFAState>();
+        restStates = new LinkedHashSet<>();
+        finalStates = new LinkedHashSet<>();
+        alphabet = new LinkedHashSet<>();
+        allStates = new LinkedHashSet<>();
+        eClosure = new LinkedHashSet<>();
+        searchedStates = new LinkedHashSet<>();
     }
 
     /**
-     * TODO
-     * @param name
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#addStartState(String)
      */
     @Override
     public void addStartState(String name) {
@@ -48,8 +47,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @param name
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#addState(String)
      */
     @Override
     public void addState(String name) {
@@ -62,8 +61,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @param name
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#addFinalState(String)
      */
     @Override
     public void addFinalState(String name) {
@@ -74,10 +73,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @param from
-     * @param onSymb
-     * @param to
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#addTransition(String, char, String)
      */
     @Override
     public void addTransition(String from, char onSymb, String to) {
@@ -98,8 +95,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @return restStates
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getStates()
      */
     @Override
     public Set<NFAState> getStates() {
@@ -107,8 +104,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @return finalStates
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getFinalStates()
      */
     @Override
     public Set<NFAState> getFinalStates() {
@@ -116,8 +113,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @return startState
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getStartState()
      */
     @Override
     public State getStartState() {
@@ -125,8 +122,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @return alphabet
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getABC()
      */
     @Override
     public Set<Character> getABC() {
@@ -134,8 +131,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @return dfa a DFA equivalent to the NFA called from
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getDFA()
      */
     @Override
     public DFA getDFA() {
@@ -145,14 +142,14 @@ public class NFA implements NFAInterface {
         Set<NFAState> nfaEClosure = eClosure(this.startState); //first set is eClosure from startState
         statesSet.add(nfaEClosure);
 
-        Stack<Set<NFAState>> stack = new Stack<>();
-        stack.push(nfaEClosure); //stack to push and pop nfaEClosures
+        Queue<Set<NFAState>> queue = new LinkedList<>();
+        queue.add(nfaEClosure); //stack to push and pop nfaEClosures
 
         dfa.addStartState(nfaEClosure.toString()); //get string from first eClosure to add as start state on DFA
 
-        while(!stack.isEmpty()){ //keep looping while still have items on stack
+        while(!queue.isEmpty()){ //keep looping while still have items on stack
             //begin popping LIFO
-            nfaEClosure = stack.pop();
+            nfaEClosure = queue.poll();
 
             for (char c : alphabet) { //for each char on alphabet find all the possible transitions for each set
                 LinkedHashSet<NFAState> temp = new LinkedHashSet<>();
@@ -170,7 +167,7 @@ public class NFA implements NFAInterface {
 
                 if(!statesSet.contains(dfaSet)){
                     statesSet.add(dfaSet);
-                    stack.push(dfaSet);
+                    queue.add(dfaSet);
 
                     //figure out if list contains any final states yet
                     boolean hasFinal = false;
@@ -199,10 +196,8 @@ public class NFA implements NFAInterface {
     }
 
     /**
-     * TODO
-     * @param fromState
-     * @param onSymb
-     * @return toStates
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#getToState(NFAState, char)
      */
     public Set<NFAState> getToState(NFAState fromState, char onSymb) {
         Set<NFAState> toStates;
@@ -214,10 +209,10 @@ public class NFA implements NFAInterface {
         }
         return toStates;
     }
-        /**
-     * TODO
-     * @param currentState
-     * @return eClosure
+
+    /**
+     * (non-Javadoc)
+     * @see fa.nfa.NFAInterface#eClosure(NFAState)
      */
     public Set<NFAState> eClosure(NFAState currentState){
         eClosure.add(currentState);
@@ -232,8 +227,7 @@ public class NFA implements NFAInterface {
         }
 
         //create temp copy of eClosure
-        LinkedHashSet<NFAState> temp = new LinkedHashSet<NFAState>();
-        temp.addAll(eClosure);
+        LinkedHashSet<NFAState> temp = new LinkedHashSet<>(eClosure);
 
         //clear lists for future searches
         eClosure.clear();
