@@ -235,7 +235,8 @@ public class NFA implements NFAInterface {
     public Set<NFAState> eClosure(NFAState currentState){
         eClosure.add(currentState);
         
-        if(!getToState(currentState,e).isEmpty() && !states.contains(currentState)){ //if there are still evalid transitions to be made from this state
+        if(!getToState(currentState,e).isEmpty() && !states.contains(currentState)){ //if there are still valid transitions to be made from this state
+                                                                                    // and this state hasn't been visited yet
            states.add(currentState);
             for(NFAState state : getToState(currentState,e)){
                 for(NFAState s: eClosure(state)){
