@@ -16,7 +16,7 @@ public class NFA implements NFAInterface {
     private final Set<NFAState> allStates;
     private final Set<Character> alphabet;
     private final LinkedHashSet<NFAState> eClosure;
-    private final LinkedHashSet<NFAState> states;
+    private final LinkedHashSet<NFAState> searchedStates;
 
     private NFAState startState; //save reference so don't have to look for it later
     private final char e = 'e'; //empty transition char
@@ -30,8 +30,7 @@ public class NFA implements NFAInterface {
         alphabet = new LinkedHashSet<Character>();
         allStates = new LinkedHashSet<NFAState>();
         eClosure = new LinkedHashSet<NFAState>();
-        states = new LinkedHashSet<NFAState>();
-
+        searchedStates = new LinkedHashSet<NFAState>();
     }
 
     /**
@@ -140,49 +139,43 @@ public class NFA implements NFAInterface {
      * @return dfa
      */
     @Override
-    public DFA getDFA() { //TODO: RE-RWITE
-        /* Initialize new DFA */
+    public DFA getDFA() {
         DFA dfa = new DFA();
 
-        /* Keep track of visited states */
-        Map<Set<NFAState>, String> visitedStates = new LinkedHashMap<>(); //Set(key) state(value) pair
+        Set<Set<NFAState>> statesSet = new LinkedHashSet<>(); //Set(key) state(value) pair
+        Set<NFAState> nfaEClosure = eClosure(this.startState); //first set is eClosure from startState
+        statesSet.add(nfaEClosure); //Add start eClosure to statesSet
 
-        /* Get the closure of the NFA's start state*/
-        Set<NFAState> states = eClosure(startState);
+        Stack<Set<NFAState>> stack = new Stack<>();
+        stack.push(nfaEClosure); //stack to push and pop nfaEClosures
 
-        /* Add to visited sates set */
-        visitedStates.put(states, states.toString());
+        dfa.addStartState(nfaEClosure.toString()); //get string from first eClosure to add as start state on DFA
 
-        LinkedList<Set<NFAState>> queue = new LinkedList<>();
+        while(!stack.isEmpty()){ //keep looping while still have items on stack
+            //begin popping LIFO
+            nfaEClosure = stack.pop();
 
-        /* Adds the set of states to the end of the queue */
-        queue.add(states);
-
-        /* Sets the start state of the DFS */
-        dfa.addStartState(visitedStates.get(states));
-
-        while(!queue.isEmpty()){
-            /* Queue based working of a linked list - Retrieves and removes the
-             * head (first element) of this list */
-            states = queue.poll();
-
-            for (char c : alphabet) {
+            for (char c : alphabet) { //for each char on alphabet find all the possible transitions for each set
                 LinkedHashSet<NFAState> temp = new LinkedHashSet<>();
-                for (NFAState s : states) {
-                    /* Adds all of the elements from 'st.getTo(c)' to temp */
-                    temp.addAll(getToState(s,c));
+
+                //store all toStates from each state in nfaEClosure over symbol c
+                for (NFAState state : nfaEClosure) {
+                    temp.addAll(getToState(state,c));
                 }
-                LinkedHashSet<NFAState> temp1 = new LinkedHashSet<>();
+
+                HashSet<NFAState> dfaSet = new HashSet<>();
+
                 for(NFAState st : temp){
-                    temp1.addAll(eClosure(st));
+                    dfaSet.addAll(eClosure(st));
                 }
-                if(!visitedStates.containsKey(temp1)){
-                    visitedStates.put(temp1, temp1.toString());
-                    queue.add(temp1);
+
+                if(!statesSet.contains(dfaSet)){
+                    statesSet.add(dfaSet);
+                    stack.push(dfaSet);
 
                     //figure out if list contains any final states yet
                     boolean hasFinal = false;
-                    for(NFAState s: temp1){
+                    for(NFAState s: dfaSet){
                         if(finalStates.contains(s)){
                             hasFinal = true;
                             break;
@@ -191,14 +184,16 @@ public class NFA implements NFAInterface {
 
                     //if list does contain final states
                     if(hasFinal){
-                        dfa.addFinalState(visitedStates.get(temp1)); //
+                        dfa.addFinalState(dfaSet.toString()); //
                     }else{
-                        dfa.addState(visitedStates.get(temp1));
+                        dfa.addState(dfaSet.toString());
                     }
                 }
 
-                /* Add transitions to the DFA */
-                dfa.addTransition(visitedStates.get(states), c, visitedStates.get(temp1));
+                //add transitions to DFA
+                String fromState = nfaEClosure.toString();
+                String toState = dfaSet.toString();
+                dfa.addTransition(fromState, c, toState);
             }
         }
         return dfa;
@@ -220,13 +215,6 @@ public class NFA implements NFAInterface {
         }
         return toStates;
     }
-
-    /**
-     * TODO
-     * @param state
-     * @return Set<NFAState>
-     */
-
         /**
      * TODO
      * @param currentState
@@ -235,23 +223,22 @@ public class NFA implements NFAInterface {
     public Set<NFAState> eClosure(NFAState currentState){
         eClosure.add(currentState);
         
-        if(!getToState(currentState,e).isEmpty() && !states.contains(currentState)){ //if there are still valid transitions to be made from this state
+        if(!getToState(currentState,e).isEmpty() && !searchedStates.contains(currentState)){ //if there are still valid transitions to be made from this state
                                                                                     // and this state hasn't been visited yet
-           states.add(currentState);
-            for(NFAState state : getToState(currentState,e)){
-                for(NFAState s: eClosure(state)){
-                    eClosure.add(s);
-                }
+            searchedStates.add(currentState);
+            for(NFAState state : getToState(currentState,e)){ //loop for each state that can be transitioned to from current state over e
+                Set<NFAState> tempEClosure = eClosure(state); //get the eCLosure from this state
+                eClosure.addAll(tempEClosure);
             }
         }
 
-        //create temp copy of eCLosure
+        //create temp copy of eClosure
         LinkedHashSet<NFAState> temp = new LinkedHashSet<NFAState>();
         temp.addAll(eClosure);
 
         //clear lists for future searches
         eClosure.clear();
-        states.clear();
+        searchedStates.clear();
 
         return temp;
     }
