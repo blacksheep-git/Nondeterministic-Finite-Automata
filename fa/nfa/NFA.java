@@ -44,7 +44,6 @@ public class NFA implements NFAInterface {
             state = new NFAState(name);
             allStates.add(state);
         }
-        state.setAsStartState();
         startState = state; // save reference to start state
     }
 
@@ -136,7 +135,7 @@ public class NFA implements NFAInterface {
 
     /**
      * TODO
-     * @return dfa
+     * @return dfa a DFA equivalent to the NFA called from
      */
     @Override
     public DFA getDFA() {
@@ -144,7 +143,7 @@ public class NFA implements NFAInterface {
 
         Set<Set<NFAState>> statesSet = new LinkedHashSet<>(); //Set(key) state(value) pair
         Set<NFAState> nfaEClosure = eClosure(this.startState); //first set is eClosure from startState
-        statesSet.add(nfaEClosure); //Add start eClosure to statesSet
+        statesSet.add(nfaEClosure);
 
         Stack<Set<NFAState>> stack = new Stack<>();
         stack.push(nfaEClosure); //stack to push and pop nfaEClosures
@@ -165,8 +164,8 @@ public class NFA implements NFAInterface {
 
                 HashSet<NFAState> dfaSet = new HashSet<>();
 
-                for(NFAState st : temp){
-                    dfaSet.addAll(eClosure(st));
+                for(NFAState state : temp){
+                    dfaSet.addAll(eClosure(state));
                 }
 
                 if(!statesSet.contains(dfaSet)){
@@ -175,8 +174,8 @@ public class NFA implements NFAInterface {
 
                     //figure out if list contains any final states yet
                     boolean hasFinal = false;
-                    for(NFAState s: dfaSet){
-                        if(finalStates.contains(s)){
+                    for(NFAState state: dfaSet){
+                        if(finalStates.contains(state)){
                             hasFinal = true;
                             break;
                         }
