@@ -15,6 +15,8 @@ public class NFA implements NFAInterface {
     private final Set<NFAState> finalStates;
     private final Set<NFAState> allStates;
     private final Set<Character> alphabet;
+    private final LinkedHashSet<NFAState> eClosure;
+    private final LinkedHashSet<NFAState> states;
 
     private NFAState startState; //save reference so don't have to look for it later
     private final char e = 'e'; //empty transition char
@@ -27,6 +29,8 @@ public class NFA implements NFAInterface {
         finalStates = new LinkedHashSet<NFAState>();
         alphabet = new LinkedHashSet<Character>();
         allStates = new LinkedHashSet<NFAState>();
+        eClosure = new LinkedHashSet<NFAState>();
+        states = new LinkedHashSet<NFAState>();
 
     }
 
@@ -222,32 +226,33 @@ public class NFA implements NFAInterface {
      * @param state
      * @return Set<NFAState>
      */
-    public Set<NFAState> eClosure(NFAState CurrentState){
-        LinkedHashSet<NFAState> eClosure = new LinkedHashSet<NFAState>();
-        LinkedHashSet<NFAState> states = new LinkedHashSet<NFAState>();
-        
-        return eClosure(states,eClosure,CurrentState);
-    }
+
         /**
      * TODO
-     * @param states
-     * @param eClosure
      * @param currentState
      * @return eClosure
      */
-    private Set<NFAState> eclosure(LinkedHashSet<NFAState> states, LinkedHashSet<NFAState> eClosure, NFAState currentState){
-
+    public Set<NFAState> eClosure(NFAState currentState){
         eClosure.add(currentState);
         
         if(!getToState(currentState,e).isEmpty() && !states.contains(currentState)){ //if there are still evalid transitions to be made from this state
            states.add(currentState);
             for(NFAState state : getToState(currentState,e)){
-                for(NFAState s: eclosure(states, eClosure, state)){
+                for(NFAState s: eClosure(state)){
                     eClosure.add(s);
                 }
             }
         }
-        return eClosure;
+
+        //create temp copy of eCLosure
+        LinkedHashSet<NFAState> temp = new LinkedHashSet<NFAState>();
+        temp.addAll(eClosure);
+
+        //clear lists for future searches
+        eClosure.clear();
+        states.clear();
+
+        return temp;
     }
 
     /**
