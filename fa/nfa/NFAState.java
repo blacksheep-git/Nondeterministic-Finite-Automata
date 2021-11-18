@@ -19,7 +19,7 @@ public class NFAState extends State {
     public NFAState(String name){
     	this.name = name;
         this.isFinalState = false;
-        this.transitions = new HashMap<Character, Set<NFAState>>();
+        this.transitions = new HashMap<>();
     }
 
     public void setAsFinalState(){
